@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'controllers/main_controller.dart';
 import 'routes/routes_pages.dart';
 import 'screens/login_screen.dart';
 import 'themes/app_theme.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Get.put(MainController());
     return GetMaterialApp(
       title: 'Olympus App Mobile',
       theme: themeLight,
