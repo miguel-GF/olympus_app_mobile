@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 import 'controllers/main_controller.dart';
@@ -6,7 +7,8 @@ import 'routes/routes_pages.dart';
 import 'screens/login_screen.dart';
 import 'themes/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load();
   runApp(const MyApp());
 }
 

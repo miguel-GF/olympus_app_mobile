@@ -1,14 +1,15 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mysql1/mysql1.dart';
 
 class DatabaseService {
   Future<MySqlConnection> connect() async {
     final ConnectionSettings settings = ConnectionSettings(
-      host: 'localhost',
-      port: 3306,
-      timeout: const Duration(seconds: 30),
-      user: 'user',
-      password: '****',
-      db: 'dbname',
+      host: dotenv.env['HOST']!,
+      port: int.tryParse(dotenv.env['PORT']!) ?? 3306,
+      timeout: Duration(seconds: int.tryParse(dotenv.env['TIMEOUT']!) ?? 60),
+      user: dotenv.env['USER'],
+      password: dotenv.env['PASSWORD'],
+      db: dotenv.env['DBNAME'],
     );
 
     return MySqlConnection.connect(settings);
