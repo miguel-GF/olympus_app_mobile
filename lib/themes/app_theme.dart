@@ -19,6 +19,12 @@ final ThemeData themeLight = ThemeData(
   ),
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: ButtonStyle(
+      textStyle: WidgetStateProperty.all<TextStyle?>(
+        const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+      ),
       foregroundColor: WidgetStateProperty.all<Color?>(colorPrimario),
       side: WidgetStateProperty.all<BorderSide?>(
         const BorderSide(color: colorPrimario),
@@ -39,6 +45,12 @@ final ThemeData themeLight = ThemeData(
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ButtonStyle(
+      textStyle: WidgetStateProperty.all<TextStyle?>(
+        const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+      ),
       backgroundColor: WidgetStateProperty.all<Color?>(
         colorPrimario,
       ),
