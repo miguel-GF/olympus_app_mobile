@@ -1,10 +1,16 @@
+import 'package:empty_widget/empty_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:lottie/lottie.dart';
 
+import '/app_assets.dart';
+import '/controllers/session_controller.dart';
 import '/controllers/usuario_controller.dart';
-// import '/routes/routes_names.dart';
+import '/models/usuario.dart';
+import '/routes/routes_names.dart';
+import '/utils/dialog_util.dart';
 import '/widgets/gb_button.dart';
 import '/widgets/gb_label_input.dart';
 
@@ -29,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _irHome() async {
-    // Get.offAndToNamed(nameTabsScreen);
     try {
+      FocusScope.of(Get.context!).unfocus();
       setState(() {
         _isLoading = true;
       });
@@ -41,14 +47,44 @@ class _LoginScreenState extends State<LoginScreen> {
         await Future.delayed(const Duration(milliseconds: 500));
         final UsuarioController usuarioController =
             Get.find<UsuarioController>();
-        await usuarioController.buscar(
+        final List<Usuario> usuarios = await usuarioController.buscar(
           usuario: usuario,
           password: password,
         );
+        if (usuarios.isEmpty) {
+          DialogUtil.showCustomBottomSheet(
+            context: Get.context!,
+            content: SizedBox(
+              width: 300,
+              height: 300,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: EmptyWidget(
+                  packageImage: PackageImage.Image_4,
+                ),
+              ),
+            ),
+            title: 'Usuario no encontrado',
+          );
+        } else {
+          final SessionController sessionController =
+            Get.find<SessionController>();
+          await sessionController.saveSession(usuarios[0]);
+          Get.offAndToNamed(nameTabsScreen);
+        }
       }
     } catch (e) {
-      print('desde login');
-      print(e);
+      DialogUtil.showCustomBottomSheet(
+        context: Get.context!,
+        content: Padding(
+          padding: const EdgeInsets.all(50),
+          child: Lottie.asset(
+            AppAssets.wifiAnimation,
+            fit: BoxFit.contain,
+          ),
+        ),
+        title: e.toString().replaceFirst('Exception: ', ''),
+      );
     } finally {
       setState(() {
         _isLoading = false;

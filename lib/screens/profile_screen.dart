@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
+import '/controllers/session_controller.dart';
 import '/widgets/gb_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  Future<void> cerrarSesion() async {
+    final SessionController sessionController = Get.find<SessionController>();
+    await sessionController.clearSession();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +45,10 @@ class ProfileScreen extends StatelessWidget {
         ),
         bottomNavigationBar: Container(
           padding: const EdgeInsets.all(20.0),
-          child: const GbButton(
+          child: GbButton(
                   accion: 'secundaria',
                   texto: 'Cerrar sesión',
+                  onPressed: cerrarSesion,
                 ),
         ),
       ),

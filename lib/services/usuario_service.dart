@@ -1,3 +1,5 @@
+import '/models/usuario.dart';
+import '/utils/tool_util.dart';
 import 'database_service.dart';
 
 class UsuarioService {
@@ -17,16 +19,21 @@ class UsuarioService {
     }
   }
 
-  Future<void> buscar({
+  Future<List<Usuario>> buscar({
     required String usuario,
     required String password,
   }) async {
     try {
-      // Realizar consulta
-      final List<Map<String, dynamic>> users = await dbService.query(
+      return await ToolUtil().handleDatabaseErrors(() async {
+        final List<Map<String, dynamic>> users = await dbService.query(
           "SELECT * FROM $tableName WHERE correo = ? AND password = ? AND status = 'ACTIVO'",
-          <dynamic>[usuario, password]);
-      print(users);
+          <dynamic>[usuario, password],
+        );
+
+        return users
+            .map((Map<String, dynamic> user) => Usuario.fromJson(user))
+            .toList();
+      });
     } catch (e) {
       rethrow;
     }

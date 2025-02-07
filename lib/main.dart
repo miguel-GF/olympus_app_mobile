@@ -3,8 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 import 'controllers/main_controller.dart';
+import 'routes/routes_names.dart';
 import 'routes/routes_pages.dart';
-import 'screens/login_screen.dart';
 import 'themes/app_theme.dart';
 
 Future<void> main() async {
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: themeLight,
       getPages: rutas,
       defaultTransition: Transition.leftToRightWithFade,
-      home: const LoginScreen(),
+      initialRoute: nameSplashScreen,
     );
   }
 }
