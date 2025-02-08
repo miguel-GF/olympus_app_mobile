@@ -9,6 +9,7 @@ class Usuario {
     required this.id,
     required this.correo,
     required this.empresa,
+    required this.sucursal,
     required this.claveusuario,
     required this.nombre,
     required this.tipo,
@@ -18,6 +19,7 @@ class Usuario {
   final int id;
   final String correo;
   final String empresa;
+  final String sucursal;
   final String claveusuario;
   final String nombre;
   final String tipo;
