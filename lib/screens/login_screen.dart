@@ -23,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
+  bool _obscureText = true;
   final TextEditingController usuarioTextCtr = TextEditingController();
   final TextEditingController passwordTextCtr = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else {
           final SessionController sessionController =
-            Get.find<SessionController>();
+              Get.find<SessionController>();
           await sessionController.saveSession(usuarios[0]);
           Get.offAndToNamed(nameTabsScreen);
         }
@@ -124,7 +125,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: passwordTextCtr,
                       textInputAction: TextInputAction.done,
-                      obscureText: true,
+                      obscureText: _obscureText,
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          icon: Icon(_obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility),
+                          onPressed: () {
+                            setState(() {
+                              _obscureText = !_obscureText;
+                            });
+                          },
+                        ),
+                      ),
                       validator: (String? value) {
                         if (value!.isEmpty) {
                           return 'Tu password es requerido';
