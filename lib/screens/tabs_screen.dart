@@ -15,6 +15,25 @@ class _TabsScreenState extends State<TabsScreen> {
   int _currentIndex = 0;
   final PageController _pageController = PageController();
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      final int newIndex = _pageController.page?.round() ?? 0;
+      if (newIndex != _currentIndex) {
+        setState(() {
+          _currentIndex = newIndex;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _irProfile() {
     Get.toNamed(profileScreen);
   }
@@ -26,7 +45,7 @@ class _TabsScreenState extends State<TabsScreen> {
         title: const Text('Olympus'),
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.menu), // Ícono a la derecha
+            icon: const Icon(Icons.menu, size: 30), // Ícono a la derecha
             onPressed: () {
               _irProfile();
             },

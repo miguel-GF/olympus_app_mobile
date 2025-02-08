@@ -29,17 +29,29 @@ class DialogUtil {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                const Spacer(),
-                Center(child: content),
-                const Gap(20),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                    fontSize: 22,
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        Center(child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                          child: content,
+                        )),
+                        const Gap(20),
+                        Text(
+                          title,
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium!
+                              .copyWith(
+                                fontSize: 22,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const Spacer(),
               ],
             ),
           ),
