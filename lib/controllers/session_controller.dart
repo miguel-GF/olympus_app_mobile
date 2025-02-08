@@ -9,11 +9,28 @@ import '/routes/routes_names.dart';
 
 class SessionController extends GetxController {
   final Uuid _uuid = const Uuid();
+  final Rx<Usuario> _usuario = Usuario(
+    claveusuario: '',
+    correo: '',
+    empresa: '',
+    id: 0,
+    nombre: '',
+    sucursal: '',
+    tipo: '',
+  ).obs;
+  // Getter para obtener el usuario
+  Usuario get usuario => _usuario.value;
+  // Setter para actualizar el usuario
+  // set usuario(Usuario newUser) {
+  //   _usuario.value = newUser;
+  // }
+
   Future<void> saveSession(Usuario usuario) async {
     // Almacenamos datos de usuario
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> usuarioMap = usuario.toJson();
     await prefs.setString('usuario', jsonEncode(usuarioMap));
+    _usuario.value = usuario;
     // Genera un token único
     final String token = _uuid.v4();
     // Establece la fecha de expiración (por ejemplo, 1 hora desde ahora)
@@ -45,6 +62,22 @@ class SessionController extends GetxController {
     return usuario;
   }
 
+  Future<String> getUsuarioEmpresa() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? usuarioKey = prefs.getString('usuario');
+    final Map<String, dynamic> usuarioMap = jsonDecode(usuarioKey!);
+    final Usuario usuario = Usuario.fromJson(usuarioMap);
+    return usuario.empresa;
+  }
+
+  Future<String> getUsuarioSucursal() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? usuarioKey = prefs.getString('usuario');
+    final Map<String, dynamic> usuarioMap = jsonDecode(usuarioKey!);
+    final Usuario usuario = Usuario.fromJson(usuarioMap);
+    return usuario.sucursal;
+  }
+
   Future<String?> getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('tokenExpiration');
@@ -53,6 +86,15 @@ class SessionController extends GetxController {
   Future<void> clearSession() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    _usuario.value = Usuario(
+      claveusuario: '',
+      correo: '',
+      empresa: '',
+      id: 0,
+      nombre: '',
+      sucursal: '',
+      tipo: '',
+    );
     Get.offAllNamed(nameLoginScreen);
     // await prefs.remove('usuario');
     // await prefs.remove('authToken');

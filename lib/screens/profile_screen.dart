@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '/controllers/session_controller.dart';
 import '/widgets/gb_button.dart';
+import '/widgets/profile/usuario_info_sesion_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -21,7 +22,6 @@ class ProfileScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: SingleChildScrollView(
-              
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -29,7 +29,10 @@ class ProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       IconButton(
-                        icon: const Icon(Icons.close), // Ícono a la derecha
+                        icon: const Icon(
+                          Icons.close,
+                          size: 30,
+                        ), // Ícono a la derecha
                         onPressed: () {
                           Get.back();
                         },
@@ -37,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                   const Gap(20),
-                  const Text('Usuario logeado'),
+                  const UsuarioInfoSesionWidget(),
                 ],
               ),
             ),
@@ -46,10 +49,10 @@ class ProfileScreen extends StatelessWidget {
         bottomNavigationBar: Container(
           padding: const EdgeInsets.all(20.0),
           child: GbButton(
-                  accion: 'secundaria',
-                  texto: 'Cerrar sesión',
-                  onPressed: cerrarSesion,
-                ),
+            accion: 'secundaria',
+            texto: 'Cerrar sesión',
+            onPressed: cerrarSesion,
+          ),
         ),
       ),
     );
