@@ -22,7 +22,6 @@ class DatabaseService {
       return results.map((ResultRow row) => row.fields).toList();
     } finally {
       await connection.close();
-      print('cerro conexion de mysql');
     }
   }
 }

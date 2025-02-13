@@ -51,7 +51,11 @@ class SessionController extends GetxController {
     final DateTime expiration = DateTime.parse(expirationStr);
 
     // Verifica si el token sigue siendo válido
-    return DateTime.now().isBefore(expiration);
+    final bool isValid = DateTime.now().isBefore(expiration);
+    if (isValid) {
+      await getUsuario();
+    }
+    return isValid;
   }
 
   Future<Usuario> getUsuario() async {
@@ -59,6 +63,7 @@ class SessionController extends GetxController {
     final String? usuarioKey = prefs.getString('usuario');
     final Map<String, dynamic> usuarioMap = jsonDecode(usuarioKey!);
     final Usuario usuario = Usuario.fromJson(usuarioMap);
+    _usuario.value = usuario;
     return usuario;
   }
 

@@ -43,6 +43,15 @@ class UsuarioInfoSesionWidget extends StatelessWidget {
             minFontSize: 16,
             overflow: TextOverflow.ellipsis,
           ),
+          AutoSizeText(
+            sessionController.usuario.sucursal,
+            style: Theme.of(context).textTheme.displayMedium!.copyWith(
+              fontSize: 17,
+            ),
+            maxLines: 2,
+            minFontSize: 16,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

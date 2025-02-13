@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
-import '../routes/routes_names.dart';
+import '/routes/routes_names.dart';
+import 'tabs/ventas_screen.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -56,7 +57,7 @@ class _TabsScreenState extends State<TabsScreen> {
         controller: _pageController,
         children: const <Widget>[
           Text('Uno'),
-          Text('Dos'),
+          VentasScreen(),
         ],
       ),
       bottomNavigationBar: StylishBottomBar(

@@ -6,14 +6,16 @@ class UsuarioService {
   final DatabaseService dbService = DatabaseService();
   static String tableName = 'usuarios';
 
-  Future<void> listar() async {
+  Future<List<Usuario>> listar() async {
     try {
       // Realizar consulta
       // final List<Map<String, dynamic>> users =
       //     await dbService.query('SELECT * FROM users WHERE age > ?', [18]);
       final List<Map<String, dynamic>> users = await dbService
           .query("SELECT * FROM $tableName WHERE status = 'ACTIVO'");
-      print(users);
+      return users
+            .map((Map<String, dynamic> user) => Usuario.fromJson(user))
+            .toList();
     } catch (e) {
       rethrow;
     }
