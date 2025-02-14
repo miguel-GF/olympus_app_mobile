@@ -1,11 +1,16 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../controllers/session_controller.dart';
 import '../../controllers/venta_controller.dart';
 import '../../models/venta.dart';
+import '../../themes/color_palette.dart';
+import '../../utils/tool_util.dart';
+import '../../widgets/ventas/venta_item_widget.dart';
 
 class VentasScreen extends StatefulWidget {
   const VentasScreen({super.key});
@@ -18,11 +23,12 @@ class _VentasScreenState extends State<VentasScreen> {
   DateTimeRange? selectedRange = DateTimeRange(
     start: DateTime.now(),
     end: DateTime.now(),
-  ); 
+  );
   String selectedFilter = '📌 Hoy';
   final SessionController sessionController = Get.find<SessionController>();
   final VentaController ventaController = Get.find<VentaController>();
   late Future<List<Venta>> ventasFuture;
+  double totalVentas = 0.0;
 
   @override
   void initState() {
@@ -35,17 +41,23 @@ class _VentasScreenState extends State<VentasScreen> {
     setState(() {
       selectedRange = range;
       selectedFilter = filter;
-      ventasFuture = _fetchVentas(); // 🔹 Vuelve a llamar a la API con el nuevo rango
+      ventasFuture =
+          _fetchVentas(); // 🔹 Vuelve a llamar a la API con el nuevo rango
     });
   }
 
   Future<List<Venta>> _fetchVentas() async {
-    return ventaController.listar(
+    final List<Venta> ventas = await ventaController.listar(
       empresa: sessionController.usuario.empresa,
       sucursal: sessionController.usuario.sucursal,
       fechaInicio: DateFormat('yyyy-MM-dd').format(selectedRange!.start),
       fechaFin: DateFormat('yyyy-MM-dd').format(selectedRange!.end),
     );
+    totalVentas = ventas
+        .where((Venta venta) => venta.status == 'PAGADO')
+        .fold(0, (double sum, Venta venta) => sum + venta.total);
+    setState(() {});
+    return ventas;
   }
 
   @override
@@ -70,7 +82,8 @@ class _VentasScreenState extends State<VentasScreen> {
           Expanded(
             child: FutureBuilder<List<Venta>>(
               future: ventasFuture,
-              builder: (BuildContext context, AsyncSnapshot<List<Venta>> snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<List<Venta>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SkeletonListView();
                 } else if (snapshot.hasError) {
@@ -82,13 +95,41 @@ class _VentasScreenState extends State<VentasScreen> {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (BuildContext context, int index) {
                     final Venta venta = snapshot.data![index];
-                    return ListTile(
-                      title: Text(venta.cliente),
-                      trailing: const Icon(Icons.arrow_forward_ios),
+                    return VentaItemWidget(
+                      venta: venta,
                     );
                   },
                 );
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    'Total de ventas pagadas',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                      fontSize: 18,
+                      color: colorGris600,
+                    ),
+                  ),
+                  const Gap(6),
+                  AutoSizeText(
+                    ToolUtil().formatCurrency(totalVentas),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                      fontSize: 28
+                    ),
+                    maxLines: 1,
+                    minFontSize: 24,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -177,11 +218,16 @@ class DateFilterWidgetState extends State<DateFilterWidget> {
             children: <Widget>[
               _filterButton('📌 Hoy', () => _setDateRange(0, '📌 Hoy')),
               _filterButton('📌 Ayer', () => _setDateRange(1, '📌 Ayer')),
-              _filterButton('📌 Últimos 7 días', () => _setDateRange(7, '📌 Últimos 7 días')),
-              _filterButton('📌 Últimos 30 días', () => _setDateRange(30, '📌 Últimos 30 días')),
-              _filterButton('📌 Este mes', () => _setDateRange(-1, '📌 Este mes')),
-              _filterButton('📌 Mes anterior', () => _setDateRange(-2, '📌 Mes anterior')),
-              _filterButton('📅 Personalizado', () => _selectDateRange(context)),
+              _filterButton('📌 Últimos 7 días',
+                  () => _setDateRange(7, '📌 Últimos 7 días')),
+              _filterButton('📌 Últimos 30 días',
+                  () => _setDateRange(30, '📌 Últimos 30 días')),
+              _filterButton(
+                  '📌 Este mes', () => _setDateRange(-1, '📌 Este mes')),
+              _filterButton('📌 Mes anterior',
+                  () => _setDateRange(-2, '📌 Mes anterior')),
+              _filterButton(
+                  '📅 Personalizado', () => _selectDateRange(context)),
             ],
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 
 class ToolUtil {
@@ -32,5 +33,15 @@ class ToolUtil {
     } catch (e) {
       throw Exception('Error inesperado de base de datos: $e');
     }
+  }
+
+  String formatCurrency(double amount) {
+    final NumberFormat currencyFormat = NumberFormat.currency(
+      locale: 'es_MX',
+      symbol: r'$',
+      decimalDigits: 2,
+    );
+
+    return currencyFormat.format(amount);
   }
 }
