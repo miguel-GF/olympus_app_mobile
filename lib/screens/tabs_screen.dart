@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '/routes/routes_names.dart';
+import 'tabs/home_screen.dart';
 import 'tabs/ventas_screen.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -56,7 +57,7 @@ class _TabsScreenState extends State<TabsScreen> {
       body: PageView(
         controller: _pageController,
         children: const <Widget>[
-          Text('Uno'),
+          HomeScreen(),
           VentasScreen(),
         ],
       ),
