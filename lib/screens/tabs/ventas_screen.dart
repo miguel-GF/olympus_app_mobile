@@ -168,6 +168,9 @@ class DateFilterWidgetState extends State<DateFilterWidget> {
       context: context,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
+      saveText: 'Buscar',
+      helpText: 'Selecciona rango de fechas',
+      keyboardType: TextInputType.text,
     );
 
     if (picked != null) {

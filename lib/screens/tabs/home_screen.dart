@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../constants.dart';
 import '../../controllers/session_controller.dart';
 import '../../controllers/venta_controller.dart';
-import '../../models/venta.dart';
+import '../../models/venta_grafica_home.dart';
+import '../../themes/color_palette.dart';
 import '../../utils/tool_util.dart';
 import '../../widgets/gb_shimmer_circular.dart';
 
@@ -20,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<Map<String, double>> _futureSalesData;
   final SessionController sessionController = Get.find<SessionController>();
   final VentaController ventaController = Get.find<VentaController>();
+  String nombreMes = 'asdas';
 
   @override
   void initState() {
@@ -28,16 +32,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<Map<String, double>> fetchSalesData() async {
-    final List<Venta> ventas = await ventaController.listar(
+    final DateTime now = DateTime.now();
+    DateTime start = now;
+    final DateTime end = now;
+    start = DateTime(now.year, now.month);
+    final List<VentaGraficaHome> ventas =
+        await ventaController.obtenerVentasConcentrado(
       empresa: sessionController.usuario.empresa,
       sucursal: sessionController.usuario.sucursal,
-      fechaInicio: '2025-02-01',
-      fechaFin: '2025-02-28',
+      fechaInicio: DateFormat('yyyy-MM-dd').format(start),
+      fechaFin: DateFormat('yyyy-MM-dd').format(end),
     );
-    print(ventas);
+
+    final VentaGraficaHome ventaPagada = ventas.firstWhere(
+      (VentaGraficaHome vt) => vt.status == statusVentaPagada,
+      orElse: () => VentaGraficaHome(status: 'pagada', total: 0.0),
+    );
+
+    final VentaGraficaHome ventaDeuda = ventas.firstWhere(
+      (VentaGraficaHome vt) => vt.status == statusVentaDeuda,
+      orElse: () => VentaGraficaHome(status: 'deuda', total: 0.0),
+    );
+
+    setState(() {
+      nombreMes = DateFormat('MMMM').format(DateTime.now());
+    });
     return <String, double>{
-      'ventasPagadas': 1000.0,
-      'ventasDeuda': 175.0,
+      'ventasPagadas': ventaPagada.total,
+      'ventasDeuda': ventaDeuda.total,
     };
   }
 
@@ -48,13 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
         color: Theme.of(context).primaryColor,
         onRefresh: _refreshData,
         child: Stack(children: <Widget>[
+          const SizedBox.expand(
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+            ),
+          ),
           SizedBox(
             height: Get.height,
             child: Column(
@@ -72,9 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               ConnectionState.waiting) {
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                              children: <Widget>[
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0),
                                   child: SkeletonLine(
                                     style: SkeletonLineStyle(
                                       height: Get.height * 0.15,
@@ -88,7 +115,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 const SizedBox(height: 40),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 80.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 80.0),
                                   child: SkeletonLine(
                                     style: SkeletonLineStyle(
                                       height: Get.height * 0.15,
@@ -117,26 +145,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           ];
 
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
                             child: Column(
                               children: <Widget>[
-                                const Text(
-                                  'Resumen de Ventas del Mes 📊',
-                                  style: TextStyle(
-                                      fontSize: 20, fontWeight: FontWeight.bold),
+                                Text(
+                                  'Resumen de Ventas de ${nombreMes.capitalize}',
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 8),
                                 const Text(
                                   'Aquí puedes ver la distribución de tus ventas pagadas y pendientes.',
                                   textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontSize: 14, color: Colors.grey),
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey),
                                 ),
                                 const SizedBox(height: 20),
                                 SfCircularChart(
                                   legend: const Legend(
-                                      isVisible: true,
-                                      position: LegendPosition.bottom),
+                                    isVisible: true,
+                                    position: LegendPosition.bottom,
+                                  ),
                                   series: <DoughnutSeries<_SalesData, String>>[
                                     DoughnutSeries<_SalesData, String>(
                                       dataSource: salesData,
@@ -146,8 +177,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                           data.status,
                                       yValueMapper: (_SalesData data, _) =>
                                           data.amount,
-                                      dataLabelSettings: const DataLabelSettings(
-                                          isVisible: true),
+                                      selectionBehavior: SelectionBehavior(
+                                        enable: true,
+                                        selectedColor:
+                                            colorPrimarioClaro, // Color de selección
+                                        selectedBorderColor: Colors.black38,
+                                        selectedBorderWidth: 2,
+                                      ),
+                                      dataLabelMapper: (_SalesData data, _) =>
+                                          ToolUtil()
+                                              .formatCurrency(data.amount),
+                                      dataLabelSettings:
+                                          const DataLabelSettings(
+                                        isVisible: true,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -155,7 +198,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const Text(
                                   'Total del mes',
                                   style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   ToolUtil().formatCurrency(
@@ -172,11 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
-            ),
-          ),
-          const SizedBox.expand(
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
             ),
           ),
         ]),

@@ -1,4 +1,5 @@
 import '/models/venta.dart';
+import '/models/venta_grafica_home.dart';
 import '/utils/tool_util.dart';
 import 'database_service.dart';
 
@@ -28,7 +29,7 @@ class VentaService {
     }
   }
 
-  Future<List<Venta>> obtenerVentasConcentrado({
+  Future<List<VentaGraficaHome>> obtenerVentasConcentrado({
     required String empresa,
     required String sucursal,
     required String fechaInicio,
@@ -37,12 +38,12 @@ class VentaService {
     try {
       return await ToolUtil().handleDatabaseErrors(() async {
         final List<Map<String, dynamic>> ventas = await dbService.query(
-          "SELECT v.status, SUM(COALESCE(v.total, 0)) FROM $tableName AS v WHERE v.empresa = ? AND v.sucursal = ? AND DATE_FORMAT(v.fecha, '%Y-%m-%d') BETWEEN ? AND ? GROUP BY v.status",
+          "SELECT LOWER(v.status) AS status, SUM(COALESCE(v.total, 0)) AS total FROM $tableName AS v WHERE v.empresa = ? AND v.sucursal = ? AND DATE_FORMAT(v.fecha, '%Y-%m-%d') BETWEEN ? AND ? GROUP BY v.status",
           <dynamic>[empresa, sucursal, fechaInicio, fechaFin],
         );
 
         return ventas
-            .map((Map<String, dynamic> user) => Venta.fromJson(user))
+            .map((Map<String, dynamic> user) => VentaGraficaHome.fromJson(user))
             .toList();
       });
     } catch (e) {

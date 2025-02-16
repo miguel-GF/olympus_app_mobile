@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 import 'controllers/main_controller.dart';
 import 'routes/routes_names.dart';
@@ -9,6 +12,12 @@ import 'themes/app_theme.dart';
 
 Future<void> main() async {
   await dotenv.load();
+  await initializeDateFormatting();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  Intl.defaultLocale = 'es_MX';
   runApp(const MyApp());
 }
 
