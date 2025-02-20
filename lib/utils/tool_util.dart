@@ -2,6 +2,8 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 
+import 'exception_util.dart';
+
 class ToolUtil {
   Future<bool> checkInternetConnection() async {
     final List<ConnectivityResult> connectivityResult =
@@ -20,18 +22,19 @@ class ToolUtil {
     } on MySqlException catch (e) {
       switch (e.errorNumber) {
         case 1045:
-          throw Exception('Acceso denegado: Credenciales incorrectas.');
-        case 1049:
-          throw Exception('Base de datos desconocida.');
+          throw DatabaseException('Acceso denegado: Credenciales incorrectas.');
+        // case 1049:
+        case 1044:
+          throw DatabaseException('Base de datos desconocida.');
         case 1054:
-          throw Exception('Columna desconocida en la consulta.');
+          throw DatabaseException('Columna desconocida en la consulta.');
         case 1146:
-          throw Exception('La tabla especificada no existe.');
+          throw DatabaseException('La tabla especificada no existe.');
         default:
-          throw Exception('Error de MySQL (${e.errorNumber}): ${e.message}');
+          throw DatabaseException('Error de MySQL (${e.errorNumber}): ${e.message}');
       }
     } catch (e) {
-      throw Exception('Error inesperado de base de datos: $e');
+      throw DatabaseException('Error inesperado de base de datos: $e');
     }
   }
 

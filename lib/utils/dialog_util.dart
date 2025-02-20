@@ -6,6 +6,7 @@ class DialogUtil {
     required BuildContext context,
     required Widget content,
     required String title,
+    double heightFactor = 0.75,
   }) {
     showModalBottomSheet(
       context: context,
@@ -16,7 +17,7 @@ class DialogUtil {
       ),
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          heightFactor: 0.75,
+          heightFactor: heightFactor,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

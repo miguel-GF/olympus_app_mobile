@@ -11,6 +11,7 @@ import '/controllers/usuario_controller.dart';
 import '/models/usuario.dart';
 import '/routes/routes_names.dart';
 import '/utils/dialog_util.dart';
+import '/utils/exception_util.dart';
 import '/widgets/gb_button.dart';
 import '/widgets/gb_label_input.dart';
 
@@ -74,17 +75,44 @@ class _LoginScreenState extends State<LoginScreen> {
           Get.offAndToNamed(nameTabsScreen);
         }
       }
-    } catch (e) {
-      DialogUtil.showCustomBottomSheet(
-        context: Get.context!,
-        content: Padding(
-          padding: const EdgeInsets.all(50),
-          child: Lottie.asset(
-            AppAssets.wifiAnimation,
-            fit: BoxFit.contain,
-          ),
+    } on ConnectionException catch (e) {
+      _showErrorDialog(
+        e.message,
+        Lottie.asset(
+          AppAssets.wifiAnimation,
+          fit: BoxFit.contain,
         ),
-        title: e.toString().replaceFirst('Exception: ', ''),
+        0.75,
+      );
+    } on AuthenticationException catch (e) {
+      _showErrorDialog(
+        e.message,
+        const Icon(
+          Icons.error_outline_rounded,
+          size: 100,
+          color: Color.fromRGBO(180, 38, 2, 1),
+        ),
+        0.5,
+      );
+    } on DatabaseException catch (e) {
+      _showErrorDialog(
+        e.toString().replaceFirst('Exception: ', ''),
+        const Icon(
+          Icons.cloud_off_rounded,
+          size: 100,
+          color: Color.fromRGBO(180, 38, 2, 1),
+        ),
+        0.5,
+      );
+    } catch (e) {
+      _showErrorDialog(
+        'Ocurrió un error inesperado',
+        const Icon(
+          Icons.error_outline_rounded,
+          size: 100,
+          color: Color.fromRGBO(180, 38, 2, 1),
+        ),
+        0.5,
       );
     } finally {
       setState(() {
@@ -93,15 +121,28 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showErrorDialog(
+      String message, Widget imageWidget, double? heightFactor) {
+    DialogUtil.showCustomBottomSheet(
+      context: Get.context!,
+      content: Padding(
+        padding: const EdgeInsets.all(50),
+        child: imageWidget,
+      ),
+      title: message,
+      heightFactor: heightFactor ?? 0.75,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Olympus'),
+        title: const Text('Olympus RT'),
       ),
       body: SafeArea(
-        child: SizedBox.expand(
-          child: Center(
+        child: Center(
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Form(
@@ -109,6 +150,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    SizedBox(
+                      width: Get.width * 0.6,
+                      child: Image.asset(
+                        AppAssets.logoAppImage,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const Gap(30),
                     const SizedBox(child: GbInputLabel(texto: 'Usuario')),
                     TextFormField(
                       controller: usuarioTextCtr,
@@ -120,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    const MaxGap(30),
+                    const Gap(30),
                     const GbInputLabel(texto: 'Password'),
                     TextFormField(
                       controller: passwordTextCtr,
@@ -144,9 +193,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         return null;
                       },
-                      onFieldSubmitted: (_) => _irHome(),
+                      // onFieldSubmitted: (_) => _irHome(),
                     ),
-                    const MaxGap(30),
+                    const Gap(30),
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 350),
                       transitionBuilder:

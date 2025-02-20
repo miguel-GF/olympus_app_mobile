@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../app_assets.dart';
 import '../../constants.dart';
 import '../../controllers/session_controller.dart';
 import '../../controllers/venta_controller.dart';
 import '../../models/venta_grafica_home.dart';
 import '../../themes/color_palette.dart';
+import '../../utils/exception_util.dart';
 import '../../utils/tool_util.dart';
 import '../../widgets/gb_shimmer_circular.dart';
 
@@ -69,6 +73,30 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Widget _buildErrorWidget(String message, Widget imageWidget) {
+    return Expanded(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(70),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              imageWidget,
+              const MaxGap(30),
+              Text(
+                message,
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                      fontSize: 18,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,8 +154,44 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             );
                           } else if (snapshot.hasError) {
-                            return const Center(
-                                child: Text('Error al cargar los datos'));
+                            final Object? error = snapshot.error;
+
+                            if (error is ConnectionException) {
+                              return _buildErrorWidget(
+                                'No hay conexión a internet',
+                                Lottie.asset(
+                                  AppAssets.wifiAnimation,
+                                  fit: BoxFit.contain,
+                                ),
+                              );
+                            } else if (error is AuthenticationException) {
+                              return _buildErrorWidget(
+                                'Credenciales incorrectas',
+                                const Icon(
+                                  Icons.error_outline_rounded,
+                                  size: 100,
+                                  color: Color.fromRGBO(180, 38, 2, 1),
+                                ),
+                              );
+                            } else if (error is DatabaseException) {
+                              return _buildErrorWidget(
+                                'Error en la base de datos',
+                                const Icon(
+                                  Icons.cloud_off_rounded,
+                                  size: 100,
+                                  color: Color.fromRGBO(180, 38, 2, 1),
+                                ),
+                              );
+                            } else {
+                              return _buildErrorWidget(
+                                'Error inesperado ${snapshot.error}',
+                                const Icon(
+                                  Icons.error_outline_rounded,
+                                  size: 100,
+                                  color: Color.fromRGBO(180, 38, 2, 1),
+                                ),
+                              );
+                            }
                           } else if (!snapshot.hasData ||
                               snapshot.data!.isEmpty) {
                             return const Center(

@@ -44,7 +44,7 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Olympus'),
+        title: const Text('Olympus RT'),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.menu, size: 30), // Ícono a la derecha

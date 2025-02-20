@@ -13,7 +13,7 @@ import 'themes/app_theme.dart';
 Future<void> main() async {
   await dotenv.load();
   await initializeDateFormatting();
-  SystemChrome.setPreferredOrientations([
+  SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);

@@ -4,11 +4,14 @@ import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
+import '../../app_assets.dart';
 import '../../controllers/session_controller.dart';
 import '../../controllers/venta_controller.dart';
 import '../../models/venta.dart';
 import '../../themes/color_palette.dart';
+import '../../utils/exception_util.dart';
 import '../../utils/tool_util.dart';
 import '../../widgets/ventas/venta_item_widget.dart';
 
@@ -60,6 +63,28 @@ class _VentasScreenState extends State<VentasScreen> {
     return ventas;
   }
 
+  Widget _buildErrorWidget(String message, Widget imageWidget) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(70),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            imageWidget,
+            const MaxGap(30),
+            Text(
+              message,
+              style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                    fontSize: 18,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String selectedText =
@@ -87,7 +112,44 @@ class _VentasScreenState extends State<VentasScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return SkeletonListView();
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  final Object? error = snapshot.error;
+
+                  if (error is ConnectionException) {
+                    return _buildErrorWidget(
+                      'No hay conexión a internet',
+                      Lottie.asset(
+                        AppAssets.wifiAnimation,
+                        fit: BoxFit.contain,
+                      ),
+                    );
+                  } else if (error is AuthenticationException) {
+                    return _buildErrorWidget(
+                      'Credenciales incorrectas',
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        size: 100,
+                        color: Color.fromRGBO(180, 38, 2, 1),
+                      ),
+                    );
+                  } else if (error is DatabaseException) {
+                    return _buildErrorWidget(
+                      'Error en la base de datos',
+                      const Icon(
+                        Icons.cloud_off_rounded,
+                        size: 100,
+                        color: Color.fromRGBO(180, 38, 2, 1),
+                      ),
+                    );
+                  } else {
+                    return _buildErrorWidget(
+                      'Error inesperado ${snapshot.error}',
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        size: 100,
+                        color: Color.fromRGBO(180, 38, 2, 1),
+                      ),
+                    );
+                  }
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('No hay ventas disponibles'));
                 }
@@ -114,17 +176,18 @@ class _VentasScreenState extends State<VentasScreen> {
                     'Total de ventas pagadas',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                      fontSize: 18,
-                      color: colorGris600,
-                    ),
+                          fontSize: 18,
+                          color: colorGris600,
+                        ),
                   ),
                   const Gap(6),
                   AutoSizeText(
                     ToolUtil().formatCurrency(totalVentas),
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                      fontSize: 28
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(fontSize: 28),
                     maxLines: 1,
                     minFontSize: 24,
                   ),

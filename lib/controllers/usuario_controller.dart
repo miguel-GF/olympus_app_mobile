@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '/models/usuario.dart';
 import '/services/usuario_service.dart';
+import '/utils/exception_util.dart';
 import '/utils/tool_util.dart';
 
 class UsuarioController extends GetxController {
@@ -20,14 +21,16 @@ class UsuarioController extends GetxController {
     try {
       final bool hayInternet = await ToolUtil().checkInternetConnection();
       if (!hayInternet) {
-        // ignore: only_throw_errors
-        throw 'No tiene conexión a internet';  
+        throw ConnectionException();
       }
       List<Usuario> usuarios = <Usuario>[];
       usuarios = await UsuarioService().buscar(
         usuario: usuario,
         password: password,
       );
+      if (usuarios.isEmpty) {
+        throw AuthenticationException();
+      }
       return usuarios;
     } catch (e) {
       rethrow;
