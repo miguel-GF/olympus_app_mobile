@@ -50,6 +50,7 @@ dependencies:
   intl: ^0.20.2
   flutter_skeleton_ui: ^0.0.6
   syncfusion_flutter_charts: ^28.2.5+1
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +65,31 @@ dev_dependencies:
   json_serializable: ^6.9.3
   build_runner: ^2.4.14
 
+flutter_launcher_icons:
+  image_path: "assets/launcher/icon_app.png"
+  # image_path_android: "assets/launcher/icon_app.png"
+  # image_path_ios: "assets/launcher/icon_app.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+  adaptive_icon_background: "#FFFFFF" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/launcher/icon_app.png" # only available for Android 8.0 devices and above
+  # adaptive_icon_foreground_inset: 16 # only available for Android 8.0 devices and above
+  # adaptive_icon_monochrome: "assets/images/icon-monochrome-432x432.png" # only available for Android 13 devices and above
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+  # web:
+  #   generate: true
+  #   image_path: "assets/images/icon-1024x1024.png"
+  #   background_color: "#hexcode"
+  #   theme_color: "#hexcode"
+  # windows:
+  #   generate: true
+  #   image_path: "assets/images/icon-1024x1024.png"
+  #   icon_size: 48 # min:48, max:256, default: 48
+  # macos:
+  #   generate: true
+  #   image_path: "assets/images/icon-1024x1024.png"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -80,7 +106,8 @@ flutter:
     - .env
     - assets/animations/
     - assets/images/
-  #   - images/a_dot_ham.jpeg
+    - assets/launcher/
+  #   - images/a_dot_ham.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

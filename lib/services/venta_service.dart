@@ -5,7 +5,7 @@ import 'database_service.dart';
 
 class VentaService {
   final DatabaseService dbService = DatabaseService();
-  static String tableName = 'ventasRespaldo';
+  static String tableName = 'ventasRespaldoDos';
 
   Future<List<Venta>> listar({
     required String empresa,
