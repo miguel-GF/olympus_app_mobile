@@ -37,6 +37,29 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include "armeabi-v7a", "arm64-v8a", "x86_64"
+            universalApk false
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def abiName = output.getFilter(com.android.build.api.variant.FilterConfiguration.FilterType.ABI.name())
+            def versionName = variant.versionName
+            def appName = "OlympusRT" // Cambia esto por el nombre de tu app
+
+            if (abiName != null) {
+                output.outputFileName = "${appName}-${versionName}-${abiName}.apk"
+            } else {
+                output.outputFileName = "${appName}-${versionName}-universal.apk"
+            }
+        }
+    }
 }
 
 flutter {

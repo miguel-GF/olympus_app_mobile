@@ -2,7 +2,7 @@
     <!-- Permiso para acceso a Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="olympus_app_mobile"
+        android:label="Olympus RT"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

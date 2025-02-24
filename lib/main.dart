@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       title: 'Olympus App Mobile',
       theme: themeLight,
       getPages: rutas,
-      defaultTransition: Transition.leftToRightWithFade,
+      defaultTransition: Transition.rightToLeftWithFade,
       initialRoute: nameSplashScreen,
     );
   }
