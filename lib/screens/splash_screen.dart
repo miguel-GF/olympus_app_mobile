@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:video_player/video_player.dart';
 
 import '/app_assets.dart';
 import '/controllers/session_controller.dart';
@@ -12,39 +14,37 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _controller;
   final SessionController sessionController = Get.find<SessionController>();
-  late AnimationController _controller;
-  late Animation<double> _animation;
+  bool _hasNavigated = false; // Para evitar múltiples llamadas
 
   @override
   void initState() {
     super.initState();
 
-    // Configurar el controlador de animación
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat(reverse: true); // Hace que la animación se repita en reversa
+    _controller = VideoPlayerController.asset(AppAssets.splashVideo)
+      ..initialize().then((_) {
+        setState(() {});
+        _controller.setPlaybackSpeed(0.8);
+        _controller.play();
+        _controller.setVolume(0);
+      });
 
-    // Crear una animación de opacidad de 0.3 a 1.0
-    _animation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _controller.addListener(() async {
+      if (!_hasNavigated &&
+          _controller.value.position >= _controller.value.duration) {
+        _hasNavigated = true; // Marcar que ya navegamos
+        await Future<dynamic>.delayed(const Duration(milliseconds: 250));
 
-    _checkSession();
-  }
-
-  Future<void> _checkSession() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 2000));
-    final bool isValid = await sessionController.isTokenValid();
-
-    if (isValid) {
-      Get.offAndToNamed(nameTabsScreen);
-    } else {
-      Get.offAndToNamed(nameLoginScreen);
-    }
+        final bool isValid = await sessionController.isTokenValid();
+        if (isValid) {
+          Get.offAndToNamed(nameTabsScreen);
+        } else {
+          Get.offAndToNamed(nameLoginScreen);
+        }
+      }
+    });
   }
 
   @override
@@ -57,13 +57,25 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: Image.asset(
-            AppAssets.logoEmpresaImage,
-            width: Get.width * 0.35,
-            fit: BoxFit.contain,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 50.0),
+            child: _controller.value.isInitialized
+                ? SizedBox(
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        width: _controller.value.size.width,
+                        height: _controller.value.size.height,
+                        child: VideoPlayer(_controller),
+                      ),
+                    ),
+                  )
+                : LoadingAnimationWidget.dotsTriangle(
+                    color: Theme.of(context).primaryColor,
+                    size: 50,
+                  ),
           ),
         ),
       ),
